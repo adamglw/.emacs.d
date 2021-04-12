@@ -1,4 +1,33 @@
-;; Thanks, but no thanks
+;; Initialise package sources
+(require 'package)
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "http://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
+
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+;; Initialise use-package on non-Linux platforms
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+;; Load no-littering package
+;; Puts backup files (file~) in /var/backup/
+(use-package no-littering)
+
+;; Put auto-save files (#file#) in /var/auto-save
+(setq auto-save-file-name-transforms
+      '((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+
+;; Disable lock files (.#file) with this option
+;; (setq create-lockfiles nil)
+
+;; Basic UI config
 (setq inhibit-startup-message t)
 
 (scroll-bar-mode -1)    ; Disable visible scrollbar
@@ -19,23 +48,6 @@
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-;; Initialise package sources
-(require 'package)
-
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "http://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
-
-(package-initialize)
-(unless package-archive-contents
-  (package-refresh-contents))
-
-;; Initialise use-package
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
-(require 'use-package)
-(setq use-package-always-ensure t)
 
 ; need swiper package
 ; need counsel package
