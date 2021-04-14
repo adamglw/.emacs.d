@@ -42,10 +42,6 @@
 ;; Set font and size
 (set-face-attribute 'default nil :font "Hack Nerd Font" :height 105)
 
-;; Set theme
-; (use-package gruvbox-theme)
-; (load-theme 'gruvbox-dark-medium)
-
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -56,6 +52,7 @@
 ;; Disable line numbers for some modes
 (dolist (mode '(org-mode-hook
                 term-mode-hook
+                shell-mode-hook
                 eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
@@ -94,14 +91,3 @@
         doom-themes-enable-italic t) ; if nil, itaics are universally disabled
   (load-theme 'doom-gruvbox t))
 
-  ;; Enable flashing mode-line on errors
-  ;(doom-themes-visual-bell-config)
-
-  ;; Enable custom neotree theme
-  ;(doom-themes-neotree-config)
-  ;; for treemacs
- ; (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
- ; (doom-themes-treemacs-config)
-
-  ;; Corrects (and improves) org-modes;s native fontification
-  ;(doom-themes-org-config))
