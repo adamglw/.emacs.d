@@ -21,11 +21,32 @@
 (use-package no-littering)
 
 ;; Put auto-save files (#file#) in /var/auto-save
-(setq auto-save-file-name-transforms
-      '((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+;(setq auto-save-file-name-transforms
+;      '((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 
 ;; Disable lock files (.#file) with this option
 ;; (setq create-lockfiles nil)
+
+; need swiper package
+; need counsel package
+
+(use-package ivy
+  :diminish ; Keep Ivy out of modeline
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+:config
+(ivy-mode 1))
 
 ;; Basic UI config
 (setq inhibit-startup-message t)
@@ -56,26 +77,9 @@
                 eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-; need swiper package
-; need counsel package
-
-(use-package ivy
-  :diminish ; Keep Ivy out of modeline
-  :bind (("C-s" . swiper)
-         :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)
-         ("C-l" . ivy-alt-done)
-         ("C-j" . ivy-next-line)
-         ("C-k" . ivy-previous-line)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-done)
-         ("C-d" . ivy-switch-buffer-kill)
-         :map ivy-reverse-i-search-map
-         ("C-k" . ivy-previous-line)
-         ("C-d" . ivy-reverse-i-search-kill))
-:config
-(ivy-mode 1))
+;; Rainbow delimiters
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; Doom modeline
 (use-package doom-modeline
@@ -90,4 +94,3 @@
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, itaics are universally disabled
   (load-theme 'doom-gruvbox t))
-
