@@ -43,7 +43,8 @@
 (set-face-attribute 'default nil :font "Hack Nerd Font" :height 105)
 
 ;; Set theme
-(load-theme 'wombat)
+; (use-package gruvbox-theme)
+; (load-theme 'gruvbox-dark-medium)
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -79,7 +80,28 @@
 :config
 (ivy-mode 1))
 
+;; Doom modeline
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1)
   :custom (doom-modeline-height 15))
+
+;; Doom themes
+(use-package doom-themes
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, itaics are universally disabled
+  (load-theme 'doom-gruvbox t))
+
+  ;; Enable flashing mode-line on errors
+  ;(doom-themes-visual-bell-config)
+
+  ;; Enable custom neotree theme
+  ;(doom-themes-neotree-config)
+  ;; for treemacs
+ ; (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+ ; (doom-themes-treemacs-config)
+
+  ;; Corrects (and improves) org-modes;s native fontification
+  ;(doom-themes-org-config))
