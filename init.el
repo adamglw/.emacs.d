@@ -27,9 +27,7 @@
 ;; Disable lock files (.#file) with this option
 ;; (setq create-lockfiles nil)
 
-; need swiper package
-; need counsel package
-
+; Ivy completion framework, comes with Counsel and Swiper
 (use-package ivy
   :diminish ; Keep Ivy out of modeline
   :bind (("C-s" . swiper)
@@ -93,9 +91,30 @@
   :init
   (ivy-rich-mode 1))
 
+;; Configure Counsel keybindings
+(use-package counsel
+  :bind (("M-x" . counsel-M-x)
+         ("C-x b" . counsel-ibuffer)
+         ("C-x C-f" . counsel-find-file)
+         :map minibuffer-local-map
+         ("C-r" . 'counsel-minibuffer-history))
+  :config
+  (setq ivy-initial-inputs-alist nil)) ; Don't start searches with ^
+
+;; Helpful is an alternative to build in emacs help
+(use-package helpful
+;  :ensure t ; not needed as already turned on by default above
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap desribe-key] . helpful-key))
+
 ;; Doom modeline
 (use-package doom-modeline
-  :ensure t
   :init (doom-modeline-mode 1)
   :custom (doom-modeline-height 15))
 
