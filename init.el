@@ -81,6 +81,18 @@
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
+;; which-key to show available commands in minibuffer
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.3))
+
+;; ivy-rich: A more friendly inferface for ivy
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
+
 ;; Doom modeline
 (use-package doom-modeline
   :ensure t
