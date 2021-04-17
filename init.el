@@ -16,9 +16,14 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-;; Load no-littering package
+;; Use no-littering package to automatically set common paths to the new user-emacs-directory
 ;; Puts backup files (file~) in /var/backup/
 (use-package no-littering)
+
+;; Keep customisation settings out of init.el
+(setq custom-file (concat user-emacs-directory "/etc/custom.el"))
+(if (file-exists-p custom-file)
+(load custom-file))
 
 ;; Put auto-save files (#file#) in /var/auto-save
 ;(setq auto-save-file-name-transforms
@@ -157,3 +162,9 @@
 
   (evil-set-initial-state 'messages-buffer-mode 'normal)
   (evil-set-initial-state 'dashboard-mode 'normal))
+
+;; Collection of evil keybindings for other parts of emacs
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
