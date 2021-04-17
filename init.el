@@ -21,13 +21,13 @@
 (use-package no-littering)
 
 ;; Keep customisation settings out of init.el
-(setq custom-file (concat user-emacs-directory "/etc/custom.el"))
+(setq custom-file "~/.emacs.d/etc/custom.el")
 (if (file-exists-p custom-file)
 (load custom-file))
 
 ;; Put auto-save files (#file#) in /var/auto-save
-;(setq auto-save-file-name-transforms
-;      '((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+(setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 
 ;; Disable lock files (.#file) with this option
 ;; (setq create-lockfiles nil)
