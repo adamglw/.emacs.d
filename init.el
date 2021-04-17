@@ -129,17 +129,14 @@
 ;; general.el for defining keybindings
 (use-package general)
 
-;(defun voodoo/evil-hook ()
-;  (dolist (mode '(custom-mode
-;                  eshell-mode
-;                  git-rebase-mode
-;                  erc-mode
-;                  circe-server-mode
-;                  circe-chat-mode
-;                  circe-query-mode
-;                  sauron-mode
-;                  term-mode))
-;    (add-to-list 'evil-emacs-state-modes mode)))
+(defun aw/evil-hook ()
+  "Configure evil mode"
+  ;; Use emacs state for the following modes
+  (dolist (mode '(term-mode
+                  shell-mode
+                  eshell-mode
+                  git-rebase-mode))
+    (add-to-list 'evil-emacs-state-modes mode)))
 
 ;; Evil mode
 (use-package evil
@@ -148,8 +145,8 @@
   (setq evil-want-keybinding nil)
   (setq evil-want-C-u-scroll t)
   (setq evil-want-C-i-jump nil)
-;  :hook (evil-mode . voodoo/evil-hook)
   :config
+  (add-hook 'evil-mode-hook 'aw/evil-hook)
   (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
