@@ -67,7 +67,7 @@
 (setq visible-bell t)
 
 ;; Set font and size
-(set-face-attribute 'default nil :font "Hack Nerd Font" :height 105)
+(set-face-attribute 'default nil :font "Hack Nerd Font" :height 109)
 
 ;; Column and line numbers
 (column-number-mode)
@@ -121,7 +121,8 @@
 ;; Doom modeline
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
-  :custom (doom-modeline-height 15))
+;  :custom (doom-modeline-height 20)
+)
 
 ;; Doom themes
 (use-package doom-themes
@@ -129,7 +130,9 @@
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, itaics are universally disabled
-  (load-theme 'doom-gruvbox t))
+  (load-theme 'doom-gruvbox t)
+;  (load-theme 'doom-palenight t)
+)
 
 ;; general.el for defining keybindings
 (use-package general)
