@@ -135,7 +135,17 @@
 )
 
 ;; general.el for defining keybindings
-(use-package general)
+(use-package general
+  :config
+  (general-create-definer aw/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+
+  (aw/leader-keys
+    "t"  '(:ignore t :which-key "toggles")
+    "tt" '(counsel-load-theme :which-key "choose theme")))
+
 
 (defun aw/evil-hook ()
   "Configure evil mode"
