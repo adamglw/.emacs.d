@@ -190,3 +190,17 @@
   ("j" text-scale-increase "in")
   ("k" text-scale-decrease "out")
   ("f" nil "finished" :exit t))
+
+(aw/leader-keys
+  "ts" '(hydra-text-scale/body :which-key "scale text"))
+
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  (when (file-directory-p "~/code")
+    (setq projectile-project-search-path '("~/code")))
+  (setq projectile-switch-project-action #'projectile-dired))
