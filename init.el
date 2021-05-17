@@ -67,7 +67,7 @@
 (setq visible-bell t)
 
 ;; Set font and size
-(set-face-attribute 'default nil :font "Hack Nerd Font" :height 109)
+(set-face-attribute 'default nil :font "Hack Nerd Font" :height 106)
 
 ;; Column and line numbers
 (column-number-mode)
@@ -194,6 +194,7 @@
 (aw/leader-keys
   "ts" '(hydra-text-scale/body :which-key "scale text"))
 
+;; Projectile is a project interaction library to provide easy project management and navigation
 (use-package projectile
   :diminish projectile-mode
   :config (projectile-mode)
@@ -205,6 +206,16 @@
     (setq projectile-project-search-path '("~/code")))
   (setq projectile-switch-project-action #'projectile-dired))
 
+;; Counsel-projectile provides further ivy integration by taking advantage of ivy's support for
+;; selecting from a list of actions and applying an action without leaving the completion session.
 (use-package counsel-projectile
   :config (counsel-projectile-mode))
 
+;; Magit is a Git Porcelain inside Emacs
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+;; Forge allows you to work with Git forges, such as Github, from the comfort of Magit
+;; and the rest of Emacs.
+;(use-package forge)
