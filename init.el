@@ -204,3 +204,7 @@
   (when (file-directory-p "~/code")
     (setq projectile-project-search-path '("~/code")))
   (setq projectile-switch-project-action #'projectile-dired))
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
