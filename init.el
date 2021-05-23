@@ -187,7 +187,7 @@
 
 (defhydra hydra-text-scale (:timeout 4)
   "scale text"
-  ("j" text-scale-increase "in")
+  (izll"j" text-scale-increase "in")
   ("k" text-scale-decrease "out")
   ("f" nil "finished" :exit t))
 
@@ -230,20 +230,23 @@
 (use-package org
   :hook (org-mode . aw/org-mode-setup)
   :config
-  (setq org-ellipsis " ⮟"
+  (setq org-ellipsis "⤵"
 	org-hide-emphasis-markers t))
 
 (use-package org-bullets
   :after org
-  :hook (org-mode . org-bullets-mode))
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
 (with-eval-after-load 'org-faces
   (dolist (face '((org-level-1 . 1.2)
 		  (org-level-2 . 1.1)
 		  (org-level-3 . 1.05)
 		  (org-level-4 . 1.0)
-		  (org-level-5 . 1.1)
-	   	  (org-level-6 . 1.1)
-		  (org-level-7 . 1.1)
-		  (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Noto Sans" :weight 'regular :height (cdr face))))
+		  (org-level-5 . 1.0)
+	   	  (org-level-6 . 1.0)
+		  (org-level-7 . 1.0)
+		  (org-level-8 . 1.0)))
+;;    (set-face-attribute (car face) nil :font "Hack Nerd Font" :weight 'regular :height (cdr face))
+  ))
