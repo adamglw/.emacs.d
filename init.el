@@ -67,7 +67,7 @@
 (setq visible-bell t)
 
 ;; Set font and size
-(set-face-attribute 'default nil :font "Hack Nerd Font" :height 106)
+(set-face-attribute 'default nil :font "Hack Nerd Font" :height 105)
 
 ;; Column and line numbers
 (column-number-mode)
@@ -230,8 +230,13 @@
 (use-package org
   :hook (org-mode . aw/org-mode-setup)
   :config
-  (setq org-ellipsis " ▼"
+  (setq org-ellipsis "..."
 	org-hide-emphasis-markers t))
+;; " ▼"
+
+(font-lock-add-keywords 'org-mode
+			'(("^ *\\([-]\\) "
+			   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
 (use-package org-bullets
   :after org
@@ -239,14 +244,41 @@
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-(with-eval-after-load 'org-faces
-  (dolist (face '((org-level-1 . 1.5)
-		  (org-level-2 . 1.25)
-		  (org-level-3 . 1.1)
-		  (org-level-4 . 1.05)
-		  (org-level-5 . 1.0)
-	   	  (org-level-6 . 1.0)
-		  (org-level-7 . 1.0)
-		  (org-level-8 . 1.0)))
-    (set-face-attribute (car face) nil :font "ETBembo" :weight 'regular :height (cdr face))
-  ))
+(let* ((variable-tuple
+	(cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
+	      ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
+	      (nil (warn "Cannot find a Sans Serif Font.  Install one!"))))
+       (base-font-color     (face-foreground 'default nil 'default))
+       (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+
+  (custom-theme-set-faces
+   'user
+   `(org-level-8 ((t (,@headline ,@variable-tuple))))
+   `(org-level-7 ((t (,@headline ,@variable-tuple))))
+   `(org-level-6 ((t (,@headline ,@variable-tuple))))
+   `(org-level-5 ((t (,@headline ,@variable-tuple))))
+   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.05))))
+   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.1))))
+   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.25))))
+   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.5))))
+   `(org-document-title ((t (,@headline ,@variable-tuple :height 1.75 :underline nil))))))
+
+(custom-theme-set-faces
+ 'user
+ '(variable-pitch ((t (:family "ETBembo" :height 135))))
+ '(fixed-pitch ((t ( :family "Hack Nerd Font" :height 105)))))
+
+(custom-theme-set-faces
+ 'user
+ '(org-block ((t (:inherit fixed-pitch))))
+ '(org-code ((t (:inherit (shadow fixed-pitch)))))
+ '(org-document-info ((t)))
+ '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+ '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+ '(org-link ((t (:underline t))))
+ '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-property-value ((t (:inherit fixed-pitch))) t)
+ '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-table ((t (:inherit fixed-pitch))))
+ '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+ '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
