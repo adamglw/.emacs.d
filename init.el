@@ -230,9 +230,8 @@
 (use-package org
   :hook (org-mode . aw/org-mode-setup)
   :config
-  (setq org-ellipsis "..."
+  (setq org-ellipsis " ▼"
 	org-hide-emphasis-markers t))
-;; " ▼"
 
 (font-lock-add-keywords 'org-mode
 			'(("^ *\\([-]\\) "
@@ -245,9 +244,9 @@
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
 (let* ((variable-tuple
-	(cond ((x-list-fonts "Source Sans 3")         '(:font "Source Sans 3"))
-	      ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
-	      (nil (warn "Cannot find a Sans Serif Font.  Install one!"))))
+	(cond ((x-list-fonts "Source Sans 3 VF")         '(:font "Source Sans 3 VF"))
+	      ((x-family-fonts "Sans")    '(:family "Sans"))
+	      (nil (warn "Cannot find a Sans font.  Install one!"))))
         (headline           `(:inherit default :weight bold)))
 
 
@@ -258,14 +257,14 @@
    `(org-level-6 ((t (,@headline ,@variable-tuple))))
    `(org-level-5 ((t (,@headline ,@variable-tuple))))
    `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.05))))
-   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.1))))
+   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.10))))
    `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.15))))
-   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.25))))
-   `(org-document-title ((t (,@headline ,@variable-tuple :height 1.75 :underline nil))))))
+   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.20))))
+   `(org-document-title ((t (,@headline ,@variable-tuple :height 1.25 :underline nil))))))
 
 (custom-theme-set-faces
  'user
- '(variable-pitch ((t (:family "Source Sans 3" :height 135))))
+ '(variable-pitch ((t (:family "Source Sans 3 VF" :height 120))))
  '(fixed-pitch ((t ( :family "Hack Nerd Font" :height 105)))))
 
 (custom-theme-set-faces
