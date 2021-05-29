@@ -245,11 +245,11 @@
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
 (let* ((variable-tuple
-	(cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
+	(cond ((x-list-fonts "Source Sans 3")         '(:font "Source Sans 3"))
 	      ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
 	      (nil (warn "Cannot find a Sans Serif Font.  Install one!"))))
-       (base-font-color     (face-foreground 'default nil 'default))
-       (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+        (headline           `(:inherit default :weight bold)))
+
 
   (custom-theme-set-faces
    'user
@@ -259,13 +259,13 @@
    `(org-level-5 ((t (,@headline ,@variable-tuple))))
    `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.05))))
    `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.1))))
-   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.25))))
-   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.5))))
+   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.15))))
+   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.25))))
    `(org-document-title ((t (,@headline ,@variable-tuple :height 1.75 :underline nil))))))
 
 (custom-theme-set-faces
  'user
- '(variable-pitch ((t (:family "ETBembo" :height 135))))
+ '(variable-pitch ((t (:family "Source Sans 3" :height 135))))
  '(fixed-pitch ((t ( :family "Hack Nerd Font" :height 105)))))
 
 (custom-theme-set-faces
