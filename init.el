@@ -224,8 +224,7 @@
   (org-indent-mode)
   (variable-pitch-mode 1)
   (auto-fill-mode 0)
-  (visual-line-mode 1)
-  (setq evil-auto-indent nil))
+  (visual-line-mode 1))
 
 (use-package org
   :hook (org-mode . aw/org-mode-setup)
@@ -256,10 +255,10 @@
    `(org-level-7 ((t (,@headline ,@variable-tuple))))
    `(org-level-6 ((t (,@headline ,@variable-tuple))))
    `(org-level-5 ((t (,@headline ,@variable-tuple))))
-   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.05))))
-   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.10))))
-   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.15))))
-   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.20))))
+   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.10))))
+   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.15))))
+   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.20))))
+   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.25))))
    `(org-document-title ((t (,@headline ,@variable-tuple :height 1.25 :underline nil))))))
 
 (custom-theme-set-faces
@@ -281,3 +280,12 @@
  '(org-table ((t (:inherit fixed-pitch))))
  '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
  '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
+
+(defun aw/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+	visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :defer t
+  :hook (org-mode . aw/org-mode-visual-fill))
