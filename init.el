@@ -289,3 +289,12 @@
 (use-package visual-fill-column
   :defer t
   :hook (org-mode . aw/org-mode-visual-fill))
+
+(use-package org-roam
+  :hook
+  (after-init . org-roam-mode)
+  :custom
+  (org-roam-directory "~/org-roam")
+  :bind (:map org-roam-mode-map
+	      (("C-c n l" . org-roam)
+	       ("C-c n f" . org-roam-find-file))))
