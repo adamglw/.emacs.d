@@ -221,7 +221,7 @@
 ;(use-package forge)
 
 (defun aw/org-mode-setup ()
-  (org-indent-mode)
+  (org-indent-mode 0)
   (variable-pitch-mode 1)
   (auto-fill-mode 0)
   (visual-line-mode 1))
@@ -231,6 +231,8 @@
   :config
   (setq org-ellipsis " ▼"
 	org-hide-emphasis-markers t))
+
+;(evil-define-key '(normal insert) evil-org-mode-map (kbd "M-") 'org-meta-return)
 
 (font-lock-add-keywords 'org-mode
 			'(("^ *\\([-]\\) "
@@ -243,10 +245,10 @@
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
 (let* ((variable-tuple
-	(cond ((x-list-fonts "Source Sans 3 VF")         '(:font "Source Sans 3 VF"))
-	      ((x-family-fonts "Sans")    '(:family "Sans"))
+	(cond ((x-list-fonts "Source Sans 3 VF") '(:font "Source Sans 3 VF"))
+	      ((x-family-fonts "Sans") '(:family "Sans"))
 	      (nil (warn "Cannot find a Sans font.  Install one!"))))
-        (headline           `(:inherit default :weight bold)))
+          (headline `(:inherit default :weight bold)))
 
 
   (custom-theme-set-faces
