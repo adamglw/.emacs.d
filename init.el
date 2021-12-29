@@ -67,7 +67,8 @@
 (setq visible-bell t)
 
 ;; Set font and size
-(set-face-attribute 'default nil :font "Hack Nerd Font" :height 105)
+;(set-face-attribute 'default nil :font "Hack Nerd Font" :height 105)
+(set-face-attribute 'default nil :font "Source Code Pro" :height 110)
 
 ;; Column and line numbers
 (column-number-mode)
@@ -118,6 +119,9 @@
   ([remap describe-variable] . counsel-describe-variable)
   ([remap desribe-key] . helpful-key))
 
+(use-package all-the-icons
+  :if (display-graphic-p))
+
 ;; Doom modeline
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
@@ -130,7 +134,7 @@
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, itaics are universally disabled
-  (load-theme 'doom-zenburn t)
+  (load-theme 'doom-palenight t)
 )
 
 ;; general.el for defining keybindings
@@ -186,7 +190,7 @@
 
 (defhydra hydra-text-scale (:timeout 4)
   "scale text"
-  (izll"j" text-scale-increase "in")
+  ("j" text-scale-increase "in")
   ("k" text-scale-decrease "out")
   ("f" nil "finished" :exit t))
 
@@ -264,8 +268,10 @@
 
 (custom-theme-set-faces
  'user
- '(variable-pitch ((t (:family "Source Sans 3 VF" :height 120))))
- '(fixed-pitch ((t ( :family "Hack Nerd Font" :height 105)))))
+ ;'(variable-pitch ((t (:family "Source Sans 3 VF" :height 120))))
+ ;'(fixed-pitch ((t ( :family "Hack Nerd Font" :height 105)))))
+ '(variable-pitch ((t (:family "Sans" :height 120))))
+ '(fixed-pitch ((t ( :family "Mono" :height 105)))))
 
 (custom-theme-set-faces
  'user
