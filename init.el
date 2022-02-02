@@ -67,7 +67,8 @@
 (setq visible-bell t)
 
 ;; Set font and size
-(set-face-attribute 'default nil :font "Hack Nerd Font" :height 105)
+;(set-face-attribute 'default nil :font "Hack Nerd Font" :height 105)
+(set-face-attribute 'default nil :font "Source Code Pro" :height 110)
 
 ;; Column and line numbers
 (column-number-mode)
@@ -117,6 +118,9 @@
   ([remap describe-command] . helpful-command)
   ([remap describe-variable] . counsel-describe-variable)
   ([remap desribe-key] . helpful-key))
+
+(use-package all-the-icons
+  :if (display-graphic-p))
 
 ;; Doom modeline
 (use-package doom-modeline
@@ -264,8 +268,10 @@
 
 (custom-theme-set-faces
  'user
- '(variable-pitch ((t (:family "Source Sans 3 VF" :height 120))))
- '(fixed-pitch ((t ( :family "Hack Nerd Font" :height 105)))))
+ ;'(variable-pitch ((t (:family "Source Sans 3 VF" :height 120))))
+ ;'(fixed-pitch ((t ( :family "Hack Nerd Font" :height 105)))))
+ '(variable-pitch ((t (:family "Sans" :height 120))))
+ '(fixed-pitch ((t ( :family "Mono" :height 105)))))
 
 (custom-theme-set-faces
  'user
