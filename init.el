@@ -130,7 +130,7 @@
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
         doom-themes-enable-italic t) ; if nil, itaics are universally disabled
-  (load-theme 'doom-zenburn t)
+  (load-theme 'doom-homage-black t)
 )
 
 ;; general.el for defining keybindings
@@ -186,7 +186,7 @@
 
 (defhydra hydra-text-scale (:timeout 4)
   "scale text"
-  (izll"j" text-scale-increase "in")
+  ("j" text-scale-increase "in")
   ("k" text-scale-decrease "out")
   ("f" nil "finished" :exit t))
 
