@@ -1,9 +1,9 @@
 ;; Initialise package sources
 (require 'package)
 
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+(setq package-archives '(("elpa" . "https://elpa.gnu.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
+                         ("melpa" . "https://melpa.org/packages/")))
 
 (package-initialize)
 (unless package-archive-contents
@@ -67,8 +67,8 @@
 (setq visible-bell t)
 
 ;; Set font and size
-;(set-face-attribute 'default nil :font "Hack Nerd Font" :height 105)
-(set-face-attribute 'default nil :font "Source Code Pro" :height 110)
+(set-face-attribute 'default nil :font "Hack Nerd Font" :height 110)
+;(set-face-attribute 'default nil :font "Source Code Pro" :height 110)
 
 ;; Column and line numbers
 (column-number-mode)
@@ -129,12 +129,23 @@
 )
 
 ;; Doom themes
-(use-package doom-themes
-  :config
+;(use-package doom-themes
+;  :config
   ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, itaics are universally disabled
-  (load-theme 'doom-homage-black t)
+;  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+;        doom-themes-enable-italic t) ; if nil, itaics are universally disabled
+;  (load-theme 'doom-homage-black t)
+;)
+
+;; Modus themes
+(use-package modus-themes
+  :init
+  (setq modus-themes-italic-constructs t
+        modus-themes-bold-constructs t)
+(modus-themes-load-themes)
+:config
+(modus-themes-load-vivendi)
+:bind ("<f5>" . modus-themes-toggle)
 )
 
 ;; general.el for defining keybindings
@@ -269,9 +280,9 @@
 (custom-theme-set-faces
  'user
  ;'(variable-pitch ((t (:family "Source Sans 3 VF" :height 120))))
- ;'(fixed-pitch ((t ( :family "Hack Nerd Font" :height 105)))))
+ '(fixed-pitch ((t ( :family "Hack Nerd Font" :height 110)))))
  '(variable-pitch ((t (:family "Sans" :height 120))))
- '(fixed-pitch ((t ( :family "Mono" :height 105)))))
+ ;'(fixed-pitch ((t ( :family "Mono" :height 105)))))
 
 (custom-theme-set-faces
  'user
