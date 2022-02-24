@@ -32,7 +32,7 @@
 ;; Disable lock files (.#file) with this option
 ;; (setq create-lockfiles nil)
 
-; Ivy completion framework, comes with Counsel and Swiper
+;; Ivy completion framework, comes with Counsel and Swiper
 (use-package ivy
   :diminish ; Keep Ivy out of modeline
   :bind (("C-s" . swiper)
@@ -55,20 +55,41 @@
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 ;; Basic UI config
-(setq inhibit-startup-message t)
-
+(setq inhibit-startup-message t) ; Disable startup message
 (scroll-bar-mode -1)    ; Disable visible scrollbar
 (tool-bar-mode -1)      ; Disable the toolbar
 (tooltip-mode -1)       ; Disable tooltips
 (set-fringe-mode 1)     ; Minimal side fringes
 (menu-bar-mode -1)      ; Disable the menu bar
 
+;; Remember recently edited files
+(recentf-mode 1)
+
+;; Save minibuffer entries
+(setq history-length 25)
+(savehist-mode 1)
+
+;; Remember and restore cursor location of opened files
+(save-place-mode 1)
+
+;; Move customisation variables to a separate file and load it
+(setq custom-file (locate-user-emacs-file "custom-vars.el"))
+(load custom-file 'noerror 'nomessage)
+
+;; Disable pop up UI dialogs
+(setq use-dialog-box nil)
+
+;; Revert buffers when the underlying file has changes
+(global-auto-revert-mode 1)
+
+;; Revert Dired and other buffers
+(setq global-auto-revert-non-file-buffers t)
+
 ;; Set up the visible bell
 (setq visible-bell t)
 
 ;; Set font and size
 (set-face-attribute 'default nil :font "Hack Nerd Font" :height 110)
-;(set-face-attribute 'default nil :font "Source Code Pro" :height 110)
 
 ;; Column and line numbers
 (column-number-mode)
@@ -279,10 +300,8 @@
 
 (custom-theme-set-faces
  'user
- ;'(variable-pitch ((t (:family "Source Sans 3 VF" :height 120))))
+ '(variable-pitch ((t (:family "Source Sans 3" :height 135 :weight Regular))))
  '(fixed-pitch ((t ( :family "Hack Nerd Font" :height 110)))))
- '(variable-pitch ((t (:family "Sans" :height 120))))
- ;'(fixed-pitch ((t ( :family "Mono" :height 105)))))
 
 (custom-theme-set-faces
  'user
