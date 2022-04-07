@@ -1,9 +1,9 @@
 ;; Initialise package sources
 (require 'package)
 
-(setq package-archives '(("elpa" . "https://elpa.gnu.org/packages/")
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("org" . "http://orgmode.org/elpa/")
-                         ("melpa" . "https://melpa.org/packages/")))
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (package-initialize)
 (unless package-archive-contents
@@ -328,10 +328,7 @@
   :hook (org-mode . aw/org-mode-visual-fill))
 
 (use-package org-roam
-  :hook
-  (after-init . org-roam-mode)
   :custom
-  (org-roam-directory "~/org-roam")
-  :bind (:map org-roam-mode-map
-	      (("C-c n l" . org-roam)
-	       ("C-c n f" . org-roam-find-file))))
+  (org-roam-directory (file-truename "~/org-roam"))
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+	 ("C-c n f" . org-roam-node-find)))
