@@ -54,6 +54,12 @@
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
+;; Switch toggle fullscreen to f12 as f11 is caught by aqua on macos
+(if (eq system-type 'darwin)
+    (progn
+      (global-unset-key (kbd "<f11>"))
+      (global-set-key (kbd "<f12>") 'toggle-frame-fullscreen)))
+
 ;; Basic UI config
 (setq inhibit-startup-message t) ; Disable startup message
 (scroll-bar-mode -1)    ; Disable visible scrollbar
@@ -89,7 +95,9 @@
 (setq visible-bell t)
 
 ;; Set font and size
-(set-face-attribute 'default nil :font "Hack Nerd Font" :height 110)
+(cond ((x-list-fonts "MesloLGS NF") '(set-face-attribute 'default nil :font "MesloLGS NF" :height 120))       ; mac
+      ((x-list-fonts "Hack Nerd Font") '(set-face-attribute 'default nil :font "Hack Nerd Font" :height 110)) ; linux
+      ((x-family-fonts "Mono") '(:family "Mono"))) ; grasping at straws
 
 ;; Column and line numbers
 (column-number-mode)
@@ -146,8 +154,7 @@
 ;; Doom modeline
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
-  :custom (doom-modeline-height 30)
-)
+  :custom (doom-modeline-height 30))
 
 ;; Doom themes
 ;(use-package doom-themes
@@ -155,8 +162,7 @@
   ;; Global settings (defaults)
 ;  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
 ;        doom-themes-enable-italic t) ; if nil, itaics are universally disabled
-;  (load-theme 'doom-homage-black t)
-;)
+;  (load-theme 'doom-homage-black t))
 
 ;; Modus themes
 (use-package modus-themes
@@ -166,8 +172,7 @@
 (modus-themes-load-themes)
 :config
 (modus-themes-load-vivendi)
-:bind ("<f5>" . modus-themes-toggle)
-)
+:bind ("<f5>" . modus-themes-toggle))
 
 ;; general.el for defining keybindings
 (use-package general
@@ -246,7 +251,7 @@
 (use-package counsel-projectile
   :config (counsel-projectile-mode))
 
-;; Magit is a Git Porcelain inside Emacs
+;; Magit Git Porcelain
 (use-package magit
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
@@ -280,7 +285,8 @@
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
 (let* ((variable-tuple
-	(cond ((x-list-fonts "Source Sans 3 VF") '(:font "Source Sans 3 VF"))
+	(cond ((x-list-fonts "SFNS") '(:font "SFNS"))
+	      ((x-list-fonts "Source Sans 3 VF") '(:font "Source Sans 3 VF"))
 	      ((x-family-fonts "Sans") '(:family "Sans"))
 	      (nil (warn "Cannot find a Sans font.  Install one!"))))
           (headline `(:inherit default :weight bold)))
@@ -294,14 +300,19 @@
    `(org-level-5 ((t (,@headline ,@variable-tuple))))
    `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.10))))
    `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.15))))
-   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.20))))
+   `(Org-level-2 ((t (,@headline ,@variable-tuple :height 1.20))))
    `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.25))))
    `(org-document-title ((t (,@headline ,@variable-tuple :height 1.25 :underline nil))))))
 
 (custom-theme-set-faces
  'user
- '(variable-pitch ((t (:family "Source Sans 3" :height 135 :weight Regular))))
- '(fixed-pitch ((t ( :family "Hack Nerd Font" :height 110)))))
+ (if (eq system-type 'darwin)
+     (progn
+       '(variable-pitch ((t (:family "SFNS" :height 150 :weight Regular))))
+       '(fixed-pitch ((t ( :family "MesloLGS NF" :height 120)))))
+     (progn
+       '(variable-pitch ((t (:family "Source Sans 3" :height 135 :weight Regular))))
+       '(fixed-pitch ((t ( :family "Hack Nerd Font" :height 110)))))))
 
 (custom-theme-set-faces
  'user
@@ -332,3 +343,6 @@
   (org-roam-directory (file-truename "~/org-roam"))
   :bind (("C-c n l" . org-roam-buffer-toggle)
 	 ("C-c n f" . org-roam-node-find)))
+
+;; Start in fullscreen
+(toggle-frame-fullscreen)
