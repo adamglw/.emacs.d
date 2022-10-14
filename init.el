@@ -1,40 +1,167 @@
-;; Initialise package sources
+;; Default font sizes
+(defvar aw/default-font-size 130)
+(defvar aw/default-variable-font-size 180)
+
+;; Make frame transparency overridable
+(defvar aw/frame-transparency '(90 . 90))
+
+;; The default is 800 kilobytes.  Measured in bytes.
+(setq gc-cons-threshold (* 50 1000 1000))
+
+(defun aw/display-startup-time ()
+  (message "Emacs loaded in %s with %d garbage collections."
+           (format "%.2f seconds"
+                   (float-time
+                     (time-subtract after-init-time before-init-time)))
+           gcs-done))
+
+(add-hook 'emacs-startup-hook #'aw/display-startup-time)
+
+;; Initialize package sources
 (require 'package)
 
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "http://orgmode.org/elpa/")
+                         ("org" . "https://orgmode.org/elpa/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
 
-;; Initialise use-package on non-Linux platforms
+  ;; Initialize use-package on non-Linux platforms
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-;; Use no-littering package to automatically set common paths to user-emacs-directory
-;; Puts backup files (file~) in /var/backup/
+(use-package auto-package-update
+  :custom
+  (auto-package-update-interval 7)
+  (auto-package-update-prompt-before-update t)
+  (auto-package-update-hide-results t)
+  :config
+  (auto-package-update-maybe)
+  (auto-package-update-at-time "10:00"))
+
+  ;; NOTE: If you want to move everything out of the ~/.emacs.d folder
+;; reliably, set `user-emacs-directory` before loading no-littering!
+;(setq user-emacs-directory "~/.cache/emacs")
+
 (use-package no-littering)
 
-;; Keep customisation settings out of init.el
-(setq custom-file "~/.emacs.d/etc/custom.el")
-(if (file-exists-p custom-file)
-(load custom-file))
-
-;; Put auto-save files (#file#) in /var/auto-save
+;; no-littering doesn't set this by default so we must place
+;; auto save files in the same path as it uses for sessions
 (setq auto-save-file-name-transforms
       `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 
-;; Disable lock files (.#file) with this option
-;; (setq create-lockfiles nil)
+(setq inhibit-startup-message t)
 
-;; Ivy completion framework, comes with Counsel and Swiper
+(scroll-bar-mode -1)        ; Disable visible scrollbar
+(tool-bar-mode -1)          ; Disable the toolbar
+(tooltip-mode -1)           ; Disable tooltips
+(set-fringe-mode 10)        ; Give some breathing room
+(menu-bar-mode -1)          ; Disable the menu bar
+
+;; Set up the visible bell
+(setq visible-bell t)
+
+(column-number-mode)
+(global-display-line-numbers-mode t)
+
+;; Set frame transparency
+(set-frame-parameter (selected-frame) 'alpha aw/frame-transparency)
+(add-to-list 'default-frame-alist `(alpha . ,aw/frame-transparency))
+(set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+;; Disable line numbers for some modes
+(dolist (mode '(org-mode-hook
+                term-mode-hook
+                shell-mode-hook
+                treemacs-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+(set-face-attribute 'default nil :font "Fira Code Retina" :height aw/default-font-size)
+
+;; Set the fixed pitch face
+(set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height aw/default-font-size)
+
+;; Set the variable pitch face
+(set-face-attribute 'variable-pitch nil :font "Cantarell" :height aw/default-variable-font-size :weight 'regular)
+
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+(use-package general
+  :after evil
+  :config
+  (general-create-definer aw/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+
+  (aw/leader-keys
+    "t"  '(:ignore t :which-key "toggles")
+    "tt" '(counsel-load-theme :which-key "choose theme")
+    "fde" '(lambda () (interactive) (find-file (expand-file-name "~/.emacs.d/Emacs.org")))))
+
+(use-package evil
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-i-jump nil)
+  :config
+  (evil-mode 1)
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+
+  ;; Use visual line motions even outside of visual-line-mode buffers
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+  (evil-set-initial-state 'messages-buffer-mode 'normal)
+  (evil-set-initial-state 'dashboard-mode 'normal))
+
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+
+;; Doom themes
+(use-package doom-themes
+    :init)
+
+;; Modus themes 
+(use-package modus-themes
+  :init
+  (setq modus-themes-italic-constructs t
+        modus-themes-bold-constructs t)
+(modus-themes-load-themes)
+:config
+(modus-themes-load-vivendi)
+:bind ("<f5>" . modus-themes-toggle))
+
+;; Better Modeline  
+(use-package all-the-icons)
+
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
+
+;; Which Key
+(use-package which-key
+  :defer 0
+  :diminish which-key-mode
+  :config
+  (which-key-mode)
+  (setq which-key-idle-delay 1))
+
+;; Ivy and Counsel
 (use-package ivy
-  :diminish ; Keep Ivy out of modeline
+  :diminish
   :bind (("C-s" . swiper)
          :map ivy-minibuffer-map
          ("TAB" . ivy-alt-done)
@@ -48,97 +175,36 @@
          :map ivy-reverse-i-search-map
          ("C-k" . ivy-previous-line)
          ("C-d" . ivy-reverse-i-search-kill))
-:config
-(ivy-mode 1))
-
-;; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-;; Switch toggle fullscreen to f12 as f11 is caught by aqua on macos
-(if (eq system-type 'darwin)
-    (progn
-      (global-unset-key (kbd "<f11>"))
-      (global-set-key (kbd "<f12>") 'toggle-frame-fullscreen)))
-
-;; Basic UI config
-(setq inhibit-startup-message t) ; Disable startup message
-(scroll-bar-mode -1)    ; Disable visible scrollbar
-(tool-bar-mode -1)      ; Disable the toolbar
-(tooltip-mode -1)       ; Disable tooltips
-(set-fringe-mode 1)     ; Minimal side fringes
-(menu-bar-mode -1)      ; Disable the menu bar
-
-;; Remember recently edited files
-(recentf-mode 1)
-
-;; Save minibuffer entries
-(setq history-length 25)
-(savehist-mode 1)
-
-;; Remember and restore cursor location of opened files
-(save-place-mode 1)
-
-;; Move customisation variables to a separate file and load it
-(setq custom-file (locate-user-emacs-file "custom-vars.el"))
-(load custom-file 'noerror 'nomessage)
-
-;; Disable pop up UI dialogs
-(setq use-dialog-box nil)
-
-;; Revert buffers when the underlying file has changes
-(global-auto-revert-mode 1)
-
-;; Revert Dired and other buffers
-(setq global-auto-revert-non-file-buffers t)
-
-;; Set up the visible bell
-(setq visible-bell t)
-
-;; Set font and size
-(cond ((x-list-fonts "MesloLGS NF") '(set-face-attribute 'default nil :font "MesloLGS NF" :height 120))       ; mac
-      ((x-list-fonts "Hack Nerd Font") '(set-face-attribute 'default nil :font "Hack Nerd Font" :height 110)) ; linux
-      ((x-family-fonts "Mono") '(:family "Mono"))) ; grasping at straws
-
-;; Column and line numbers
-(column-number-mode)
-(global-display-line-numbers-mode t)
-
-;; Disable line numbers for some modes
-(dolist (mode '(org-mode-hook
-                term-mode-hook
-                shell-mode-hook
-                eshell-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
-
-;; Rainbow delimiters
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
-
-;; which-key to show available commands in minibuffer
-(use-package which-key
-  :init (which-key-mode)
-  :diminish which-key-mode
   :config
-  (setq which-key-idle-delay 0.3))
+  (ivy-mode 1))
 
-;; ivy-rich: A more friendly inferface for ivy
 (use-package ivy-rich
+  :after ivy
   :init
   (ivy-rich-mode 1))
 
-;; Configure Counsel keybindings
 (use-package counsel
-  :bind (("M-x" . counsel-M-x)
-         ("C-x b" . counsel-ibuffer)
-         ("C-x C-f" . counsel-find-file)
+  :bind (("C-M-j" . 'counsel-switch-buffer)
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history))
+  :custom
+  (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
   :config
-  (setq ivy-initial-inputs-alist nil)) ; Don't start searches with ^
+  (counsel-mode 1))
 
-;; Helpful is an alternative to build in emacs help
+;; Improved Candidate Sorting with prescient.el
+(use-package ivy-prescient
+  :after counsel
+  :custom
+  (ivy-prescient-enable-filtering nil)
+  :config
+  ;; Uncomment the following line to have sorting remembered across sessions!
+  ;(prescient-persist-mode 1)
+  (ivy-prescient-mode 1))
+
+;; Helpful help comments
 (use-package helpful
-;  :ensure t ; not needed as already turned on by default above
+  :commands (helpful-callable helpful-variable helpful-command helpful-key)
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
@@ -146,84 +212,11 @@
   ([remap describe-function] . counsel-describe-function)
   ([remap describe-command] . helpful-command)
   ([remap describe-variable] . counsel-describe-variable)
-  ([remap desribe-key] . helpful-key))
+  ([remap describe-key] . helpful-key))
 
-(use-package all-the-icons
-  :if (display-graphic-p))
-
-;; Doom modeline
-(use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom (doom-modeline-height 30))
-
-;; Doom themes
-;(use-package doom-themes
-;  :config
-  ;; Global settings (defaults)
-;  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-;        doom-themes-enable-italic t) ; if nil, itaics are universally disabled
-;  (load-theme 'doom-homage-black t))
-
-;; Modus themes
-(use-package modus-themes
-  :init
-  (setq modus-themes-italic-constructs t
-        modus-themes-bold-constructs t)
-(modus-themes-load-themes)
-:config
-(modus-themes-load-vivendi)
-:bind ("<f5>" . modus-themes-toggle))
-
-;; general.el for defining keybindings
-(use-package general
-  :config
-  (general-create-definer aw/leader-keys
-    :keymaps '(normal insert visual emacs)
-    :prefix "SPC"
-    :global-prefix "C-SPC")
-
-  (aw/leader-keys
-    "t"  '(:ignore t :which-key "toggles")
-    "tt" '(counsel-load-theme :which-key "choose theme")))
-
-
-(defun aw/evil-hook ()
-  "Configure evil mode"
-  ;; Use emacs state for the following modes
-  (dolist (mode '(term-mode
-                  shell-mode
-                  eshell-mode
-                  git-rebase-mode))
-    (add-to-list 'evil-emacs-state-modes mode)))
-
-;; Evil mode
-(use-package evil
-  :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  (setq evil-want-C-u-scroll t)
-  (setq evil-want-C-i-jump nil)
-  :config
-  (add-hook 'evil-mode-hook 'aw/evil-hook)
-  (evil-mode 1)
-  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-
-  ;; Use visual line motions even outside of visual-line-mode buffers
-  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-
-  (evil-set-initial-state 'messages-buffer-mode 'normal)
-  (evil-set-initial-state 'dashboard-mode 'normal))
-
-;; Collection of evil keybindings for other parts of emacs
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
-
-;; Hydra to tie related commands into a family of short bindings
-(use-package hydra)
+;; Text scaling
+(use-package hydra
+  :defer t)
 
 (defhydra hydra-text-scale (:timeout 4)
   "scale text"
@@ -234,115 +227,214 @@
 (aw/leader-keys
   "ts" '(hydra-text-scale/body :which-key "scale text"))
 
-;; Projectile is a project interaction library to provide easy project management and navigation
-(use-package projectile
-  :diminish projectile-mode
-  :config (projectile-mode)
-  :custom ((projectile-completion-system 'ivy))
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-  :init
-  (when (file-directory-p "~/code")
-    (setq projectile-project-search-path '("~/code")))
-  (setq projectile-switch-project-action #'projectile-dired))
+;; Org mode
+(defun aw/org-font-setup ()
+  ;; Replace list hyphen with dot
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
-;; Counsel-projectile provides further ivy integration by taking advantage of ivy's support for
-;; selecting from a list of actions and applying an action without leaving the completion session.
-(use-package counsel-projectile
-  :config (counsel-projectile-mode))
+  ;; Set faces for heading levels
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
 
-;; Magit Git Porcelain
-(use-package magit
-  :custom
-  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
 
-;; Forge allows you to work with Git forges, such as Github, from the comfort of Magit
-;; and the rest of Emacs.
-;(use-package forge)
-
+;; Basic org config
 (defun aw/org-mode-setup ()
-  (org-indent-mode 0)
+  (org-indent-mode)
   (variable-pitch-mode 1)
-  (auto-fill-mode 0)
   (visual-line-mode 1))
 
 (use-package org
+  :pin org
+  :commands (org-capture org-agenda)
   :hook (org-mode . aw/org-mode-setup)
   :config
-  (setq org-ellipsis " ▼"
-	org-hide-emphasis-markers t))
+  (setq org-ellipsis " ▾")
 
-;(evil-define-key '(normal insert) evil-org-mode-map (kbd "M-") 'org-meta-return)
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
 
-(font-lock-add-keywords 'org-mode
-			'(("^ *\\([-]\\) "
-			   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+  (setq org-agenda-files
+        '("~/Projects/Code/emacs-from-scratch/OrgFiles/Tasks.org"
+          "~/Projects/Code/emacs-from-scratch/OrgFiles/Habits.org"
+          "~/Projects/Code/emacs-from-scratch/OrgFiles/Birthdays.org"))
 
+  (require 'org-habit)
+  (add-to-list 'org-modules 'org-habit)
+  (setq org-habit-graph-column 60)
+
+  (setq org-todo-keywords
+    '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+      (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+
+  (setq org-refile-targets
+    '(("Archive.org" :maxlevel . 1)
+      ("Tasks.org" :maxlevel . 1)))
+
+  ;; Save Org buffers after refiling!
+  (advice-add 'org-refile :after 'org-save-all-org-buffers)
+
+  (setq org-tag-alist
+    '((:startgroup)
+       ; Put mutually exclusive tags here
+       (:endgroup)
+       ("@errand" . ?E)
+       ("@home" . ?H)
+       ("@work" . ?W)
+       ("agenda" . ?a)
+       ("planning" . ?p)
+       ("publish" . ?P)
+       ("batch" . ?b)
+       ("note" . ?n)
+       ("idea" . ?i)))
+
+  ;; Configure custom agenda views
+  (setq org-agenda-custom-commands
+   '(("d" "Dashboard"
+     ((agenda "" ((org-deadline-warning-days 7)))
+      (todo "NEXT"
+        ((org-agenda-overriding-header "Next Tasks")))
+      (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+
+    ("n" "Next Tasks"
+     ((todo "NEXT"
+        ((org-agenda-overriding-header "Next Tasks")))))
+
+    ("W" "Work Tasks" tags-todo "+work-email")
+
+    ;; Low-effort next actions
+    ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+     ((org-agenda-overriding-header "Low Effort Tasks")
+      (org-agenda-max-todos 20)
+      (org-agenda-files org-agenda-files)))
+
+    ("w" "Workflow Status"
+     ((todo "WAIT"
+            ((org-agenda-overriding-header "Waiting on External")
+             (org-agenda-files org-agenda-files)))
+      (todo "REVIEW"
+            ((org-agenda-overriding-header "In Review")
+             (org-agenda-files org-agenda-files)))
+      (todo "PLAN"
+            ((org-agenda-overriding-header "In Planning")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
+      (todo "BACKLOG"
+            ((org-agenda-overriding-header "Project Backlog")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
+      (todo "READY"
+            ((org-agenda-overriding-header "Ready for Work")
+             (org-agenda-files org-agenda-files)))
+      (todo "ACTIVE"
+            ((org-agenda-overriding-header "Active Projects")
+             (org-agenda-files org-agenda-files)))
+      (todo "COMPLETED"
+            ((org-agenda-overriding-header "Completed Projects")
+             (org-agenda-files org-agenda-files)))
+      (todo "CANC"
+            ((org-agenda-overriding-header "Cancelled Projects")
+             (org-agenda-files org-agenda-files)))))))
+
+  (setq org-capture-templates
+    `(("t" "Tasks / Projects")
+      ("tt" "Task" entry (file+olp "~/Projects/Code/emacs-from-scratch/OrgFiles/Tasks.org" "Inbox")
+           "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+
+      ("j" "Journal Entries")
+      ("jj" "Journal" entry
+           (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
+           "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+           ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
+           :clock-in :clock-resume
+           :empty-lines 1)
+      ("jm" "Meeting" entry
+           (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
+           "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+           :clock-in :clock-resume
+           :empty-lines 1)
+
+      ("w" "Workflows")
+      ("we" "Checking Email" entry (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
+           "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
+
+      ("m" "Metrics Capture")
+      ("mw" "Weight" table-line (file+headline "~/Projects/Code/emacs-from-scratch/OrgFiles/Metrics.org" "Weight")
+       "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
+
+  (define-key global-map (kbd "C-c j")
+    (lambda () (interactive) (org-capture nil "jj")))
+
+  (aw/org-font-setup))
+
+;; Better heading bullets
 (use-package org-bullets
-  :after org
   :hook (org-mode . org-bullets-mode)
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-(let* ((variable-tuple
-	(cond ((x-list-fonts "SFNS") '(:font "SFNS"))
-	      ((x-list-fonts "Source Sans 3 VF") '(:font "Source Sans 3 VF"))
-	      ((x-family-fonts "Sans") '(:family "Sans"))
-	      (nil (warn "Cannot find a Sans font.  Install one!"))))
-          (headline `(:inherit default :weight bold)))
-
-
-  (custom-theme-set-faces
-   'user
-   `(org-level-8 ((t (,@headline ,@variable-tuple))))
-   `(org-level-7 ((t (,@headline ,@variable-tuple))))
-   `(org-level-6 ((t (,@headline ,@variable-tuple))))
-   `(org-level-5 ((t (,@headline ,@variable-tuple))))
-   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.10))))
-   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.15))))
-   `(Org-level-2 ((t (,@headline ,@variable-tuple :height 1.20))))
-   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.25))))
-   `(org-document-title ((t (,@headline ,@variable-tuple :height 1.25 :underline nil))))))
-
-(custom-theme-set-faces
- 'user
- (if (eq system-type 'darwin)
-     (progn
-       '(variable-pitch ((t (:family "SFNS" :height 150 :weight Regular))))
-       '(fixed-pitch ((t ( :family "MesloLGS NF" :height 120)))))
-     (progn
-       '(variable-pitch ((t (:family "Source Sans 3" :height 135 :weight Regular))))
-       '(fixed-pitch ((t ( :family "Hack Nerd Font" :height 110)))))))
-
-(custom-theme-set-faces
- 'user
- '(org-block ((t (:inherit fixed-pitch))))
- '(org-code ((t (:inherit (shadow fixed-pitch)))))
- '(org-document-info ((t)))
- '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
- '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
- '(org-link ((t (:underline t))))
- '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-property-value ((t (:inherit fixed-pitch))) t)
- '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-table ((t (:inherit fixed-pitch))))
- '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
- '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
-
+;; Centre org buffers
 (defun aw/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
-	visual-fill-column-center-text t)
+        visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
 (use-package visual-fill-column
-  :defer t
   :hook (org-mode . aw/org-mode-visual-fill))
 
+;; Configure Bable languages
+(with-eval-after-load 'org
+  (org-babel-do-load-languages
+      'org-babel-load-languages
+      '((emacs-lisp . t)
+      (python . t)))
+
+  (push '("conf-unix" . conf-unix) org-src-lang-modes))
+
+;Structure templates
+(with-eval-after-load 'org
+  ;; This is needed as of Org 9.2
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python")))
+
+;; Automatically tangle our Emacs.org config file when we save it
+(defun aw/org-babel-tangle-config ()
+  (when (string-equal (file-name-directory (buffer-file-name))
+                      (expand-file-name user-emacs-directory))
+    ;; Dynamic scoping to the rescue
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'aw/org-babel-tangle-config)))
+
+;; Org roam
 (use-package org-roam
   :custom
   (org-roam-directory (file-truename "~/org-roam"))
   :bind (("C-c n l" . org-roam-buffer-toggle)
-	 ("C-c n f" . org-roam-node-find)))
-
-;; Start in fullscreen
-(toggle-frame-fullscreen)
+	     ("C-c n f" . org-roam-node-find)
+         ("C-c n s" . org-roam-db-sync)))
