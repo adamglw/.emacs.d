@@ -1,9 +1,9 @@
 ;; Default font sizes
 (defvar aw/default-font-size 130)
-(defvar aw/default-variable-font-size 180)
+(defvar aw/default-variable-font-size 150)
 
 ;; Make frame transparency overridable
-(defvar aw/frame-transparency '(90 . 90))
+(defvar aw/frame-transparency '(80 . 80))
 
 ;; The default is 800 kilobytes.  Measured in bytes.
 (setq gc-cons-threshold (* 50 1000 1000))
@@ -44,7 +44,7 @@
   (auto-package-update-maybe)
   (auto-package-update-at-time "10:00"))
 
-  ;; NOTE: If you want to move everything out of the ~/.emacs.d folder
+;; NOTE: If you want to move everything out of the ~/.emacs.d folder
 ;; reliably, set `user-emacs-directory` before loading no-littering!
 ;(setq user-emacs-directory "~/.cache/emacs")
 
@@ -134,7 +134,7 @@
 (use-package doom-themes
     :init)
 
-;; Modus themes 
+;; Modus themes
 (use-package modus-themes
   :init
   (setq modus-themes-italic-constructs t
@@ -144,7 +144,7 @@
 (modus-themes-load-vivendi)
 :bind ("<f5>" . modus-themes-toggle))
 
-;; Better Modeline  
+;; Better Modeline
 (use-package all-the-icons)
 
 (use-package doom-modeline
@@ -438,3 +438,75 @@
   :bind (("C-c n l" . org-roam-buffer-toggle)
 	     ("C-c n f" . org-roam-node-find)
          ("C-c n s" . org-roam-db-sync)))
+
+;; Development
+
+;; lsp-mode
+(defun aw/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
+
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook (lsp-mode . aw/lsp-mode-setup)
+  :init
+  (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+  :config
+  (lsp-enable-which-key-integration t))
+
+;; lsp-ui
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+
+;; lsp-treemacs
+(use-package lsp-treemacs
+  :after lsp)
+
+;; lsp-ivy
+(use-package lsp-ivy
+  :after lsp)
+
+;; dap-mode
+(use-package dap-mode
+  ;; Uncomment the config below if you want all UI panes to be hidden by default!
+  ;; :custom
+  ;; (lsp-enable-dap-auto-configure nil)
+  ;; :config
+  ;; (dap-ui-mode 1)
+  :commands dap-debug
+  :config
+  ;; Set up Node debugging
+  (require 'dap-node)
+  (dap-node-setup) ;; Automatically installs Node debug adapter if needed
+
+  ;; Bind `C-c l d` to `dap-hydra` for easy access
+  (general-define-key
+    :keymaps 'lsp-mode-map
+    :prefix lsp-keymap-prefix
+    "d" '(dap-hydra t :wk "debugger")))
+
+;; TypeScript
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  :hook (typescript-mode . lsp-deferred)
+  :config
+  (setq typescript-indent-level 2))
+
+;; Python
+(use-package python-mode
+  :ensure t
+  :hook (python-mode . lsp-deferred)
+  :custom
+  ;; since Python 3 is called "python3" on macos,
+  (python-shell-interpreter "python3")
+  (dap-python-executable "python3")
+  (dap-python-debugger 'debugpy)
+  :config
+  (require 'dap-python))
+
+(use-package pyvenv
+  :after python-mode
+  :config
+  (pyvenv-mode 1))
